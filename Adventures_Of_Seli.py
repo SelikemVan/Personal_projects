@@ -21,6 +21,10 @@ pygame.mixer.music.load("intro_music.mp3")
 pygame.mixer.music.set_volume(0.5)  # Adjust the volume (0.0 to 1.0)
 pygame.mixer.music.play(-1)  # -1 makes the music loop indefinitely
 
+# Load the image
+image = pygame.image.load("your_image_file.jpg")  # Replace with the actual image file path
+image = pygame.transform.scale(image, (WIDTH, HEIGHT))  # Resize the image to fit the screen
+
 # Create the player character
 player_size = 50
 player_x = WIDTH // 2 - player_size // 2
@@ -36,25 +40,25 @@ while intro_running:
         if event.type == pygame.QUIT:
             intro_running = False
 
-    # Draw introduction screen
-    screen.fill(WHITE)
+    # Draw introduction screen with the image
+    screen.blit(image, (0, 0))
 
     # Add a customized welcome message with Times New Roman font
-    font_path = "path/to/times_new_roman.ttf"  # Replace with the actual path to your Times New Roman font file
-    font_large = pygame.font.Font(font_path, 48)
-    font_small = pygame.font.Font(font_path, 36)
+    font_path = "fonts/Gothic Bozo.ttf"  # Replace with the actual path to your Times New Roman font file
+    font_large = pygame.font.Font(font_path, 50)
+    font_small = pygame.font.Font(font_path, 40)
 
     welcome_text = font_large.render("Welcome", True, (0, 0, 0))
-    game_name_text = font_large.render("(Name of Game)", True, (0, 0, 0))
     to_text = font_small.render("To", True, (0, 0, 0))
+    game_name_text = font_large.render("The Adventures of Seli", True, (0, 0, 0))
 
     welcome_rect = welcome_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
-    game_name_rect = game_name_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-    to_rect = to_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))
+    to_rect = to_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+    game_name_rect = game_name_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))
 
     screen.blit(welcome_text, welcome_rect)
-    screen.blit(game_name_text, game_name_rect)
     screen.blit(to_text, to_rect)
+    screen.blit(game_name_text, game_name_rect)
 
     # Update display
     pygame.display.flip()
