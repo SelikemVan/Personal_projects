@@ -15,6 +15,7 @@ pygame.display.set_caption("Adventure Game")
 
 # Define colors
 WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
 
 # Load introduction music
 pygame.mixer.music.load("intro_music.mp3")
@@ -22,7 +23,7 @@ pygame.mixer.music.set_volume(0.5)  # Adjust the volume (0.0 to 1.0)
 pygame.mixer.music.play(-1)  # -1 makes the music loop indefinitely
 
 # Load the image
-image = pygame.image.load("your_image_file.jpg")  # Replace with the actual image file path
+image = pygame.image.load("background_image.png")  # Replace with the actual image file path
 image = pygame.transform.scale(image, (WIDTH, HEIGHT))  # Resize the image to fit the screen
 
 # Create the player character
@@ -33,32 +34,85 @@ player_y = HEIGHT - player_size - 10
 # Set up clock for controlling the frame rate
 clock = pygame.time.Clock()
 
-# Introduction loop
+# Introduction variables
 intro_running = True
-while intro_running:
+text_x = -WIDTH  # Initial x-coordinate for the text (off-screen to the left)
+text_speed = 5  # Adjust the speed of the text movement
+intro_start_time = pygame.time.get_ticks()  # Record the start time of the intro
+
+# Menu variables
+menu_font = pygame.font.Font("fonts/Gothic Bozo.ttf", 50)  # Use Gothic Bozo font for the menu text
+menu_text_color = WHITE
+menu_running = False
+
+# Times New Roman font for the New Game buttons and progress text
+times_new_roman_font = pygame.font.Font("fonts/Typography Times Regular.ttf", 20)
+
+# Game loop (similar to the one in the previous example)
+game_running = True
+while game_running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            intro_running = False
+            game_running = False
 
-    # Draw introduction screen with the image
-    screen.blit(image, (0, 0))
+    # Check if the intro has been running for 5 seconds
+    if intro_running and pygame.time.get_ticks() - intro_start_time >= 5000:
+        intro_running = False
+        menu_running = True
 
-    # Add a customized welcome message with Times New Roman font
-    font_path = "fonts/Gothic Bozo.ttf"  # Replace with the actual path to your Times New Roman font file
-    font_large = pygame.font.Font(font_path, 50)
-    font_small = pygame.font.Font(font_path, 40)
+    if menu_running:
+        # Draw menu background
+        screen.fill(BLACK)
 
-    welcome_text = font_large.render("Welcome", True, (0, 0, 0))
-    to_text = font_small.render("To", True, (0, 0, 0))
-    game_name_text = font_large.render("The Adventures of Seli", True, (0, 0, 0))
+        # Add text at the middle top of the window with Gothic Bozo font
+        menu_text = menu_font.render("Start a new adventure !", True, menu_text_color)
+        menu_text_rect = menu_text.get_rect(center=(WIDTH // 2, HEIGHT // 4))
+        screen.blit(menu_text, menu_text_rect)
 
-    welcome_rect = welcome_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
-    to_rect = to_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-    game_name_rect = game_name_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))
+        # Add buttons
+        button_height = 50
+        button_spacing = 20
+        button_y = HEIGHT // 2 - (button_height * 3 + button_spacing * 2) // 2
 
-    screen.blit(welcome_text, welcome_rect)
-    screen.blit(to_text, to_rect)
-    screen.blit(game_name_text, game_name_rect)
+        for i in range(3):
+            button_rect = pygame.Rect(50, button_y + (button_height + button_spacing) * i, 200, button_height)
+            pygame.draw.rect(screen, WHITE, button_rect)
+
+            button_text = times_new_roman_font.render(f"New Game {i + 1}", True, BLACK)
+            button_text_rect = button_text.get_rect(center=button_rect.center)
+            screen.blit(button_text, button_text_rect)
+
+            progress_text = times_new_roman_font.render("Progress: 0%", True, WHITE)
+            progress_text_rect = progress_text.get_rect(midleft=(button_rect.right + 10, button_rect.centery))
+            screen.blit(progress_text, progress_text_rect)
+
+    else:
+        # Draw introduction screen with the image
+        screen.blit(image, (0, 0))
+
+        # Add a customized welcome message with Gothic Bozo font
+        font_path = "fonts/Gothic Bozo.ttf"  # Replace with the actual path to your Gothic Bozo font file
+        font_large = pygame.font.Font(font_path, 50)
+        font_small = pygame.font.Font(font_path, 40)
+
+        welcome_text = font_large.render("Welcome", True, WHITE)
+        to_text = font_small.render("To", True, WHITE)
+        game_name_text = font_large.render("The Adventures of Seli!", True, WHITE)
+
+        welcome_rect = welcome_text.get_rect(center=(text_x + WIDTH // 2, HEIGHT // 2 - 50))
+        to_rect = to_text.get_rect(center=(text_x + WIDTH // 2, HEIGHT // 2))
+        game_name_rect = game_name_text.get_rect(center=(text_x + WIDTH // 2, HEIGHT // 2 + 50))
+
+        screen.blit(welcome_text, welcome_rect)
+        screen.blit(to_text, to_rect)
+        screen.blit(game_name_text, game_name_rect)
+
+        # Update text position
+        text_x += text_speed
+
+        # If the text reaches the middle, stop moving
+        if text_x >= WIDTH // 2 - game_name_rect.width // 2:
+            text_x = WIDTH // 2 - game_name_rect.width // 2
 
     # Update display
     pygame.display.flip()
@@ -70,30 +124,10 @@ while intro_running:
     keys = pygame.key.get_pressed()
     if any(keys):
         intro_running = False
+        menu_running = True
 
 # Stop the introduction music
 pygame.mixer.music.stop()
-
-# Game loop (similar to the one in the previous example)
-game_running = True
-while game_running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            game_running = False
-
-    # Update game state
-
-    # Draw background
-    screen.fill(WHITE)
-
-    # Draw player character
-    pygame.draw.rect(screen, (0, 128, 255), (player_x, player_y, player_size, player_size))
-
-    # Update display
-    pygame.display.flip()
-
-    # Cap the frame rate
-    clock.tick(FPS)
 
 # Quit Pygame
 pygame.quit()
