@@ -41,12 +41,30 @@ text_speed = 5  # Adjust the speed of the text movement
 intro_start_time = pygame.time.get_ticks()  # Record the start time of the intro
 
 # Menu variables
-menu_font = pygame.font.Font("fonts/Gothic Bozo.ttf", 50)  # Use Gothic Bozo font for the menu text
+menu_font = pygame.font.Font("fonts/Gothic Bozo.ttf", 36)  # Use Gothic Bozo font for the menu text
 menu_text_color = WHITE
 menu_running = False
 
 # Times New Roman font for the New Game buttons and progress text
-times_new_roman_font = pygame.font.Font("fonts/Typography Times Regular.ttf", 20)
+times_new_roman_font = pygame.font.Font("fonts/Typography Times Regular.ttf", 24)
+
+# Cut scene variables
+cut_scene_images = [
+    pygame.image.load("cut_scene_image_1.webp"),
+    pygame.image.load("cut_scene_image_2.webp"),
+    pygame.image.load("cut_scene_image_3.webp"),
+    pygame.image.load("cut_scene_image_4.webp")
+]  # Add your cut scene images to this list
+cut_scene_text = [
+    "In the mystical land of Eldoria, a brave adventurer named Seli embarks on a journey.",
+    "Seli discovers an ancient prophecy that foretells of a hidden artifact deep within the Forbidden Forest.",
+    "Facing perilous challenges, Seli uncovers the artifact's secrets and gains newfound powers.",
+    "As the journey continues, Seli must confront the dark forces threatening Eldoria's balance."
+]
+cut_scene_duration = 3000  # Time in milliseconds for each cut scene image
+cut_scene_index = 0
+cut_scene_timer = pygame.time.get_ticks()
+cut_scene_running = False
 
 # Game loop (similar to the one in the previous example)
 game_running = True
@@ -65,7 +83,7 @@ while game_running:
         screen.fill(BLACK)
 
         # Add text at the middle top of the window with Gothic Bozo font
-        menu_text = menu_font.render("Start a new adventure !", True, menu_text_color)
+        menu_text = menu_font.render("Start a new adventure", True, menu_text_color)
         menu_text_rect = menu_text.get_rect(center=(WIDTH // 2, HEIGHT // 4))
         screen.blit(menu_text, menu_text_rect)
 
@@ -125,6 +143,33 @@ while game_running:
     if any(keys):
         intro_running = False
         menu_running = True
+        cut_scene_running = True
+
+    # Cut scene logic
+    if cut_scene_running:
+        current_time = pygame.time.get_ticks()
+        if current_time - cut_scene_timer >= cut_scene_duration:
+            cut_scene_index = (cut_scene_index + 1) % len(cut_scene_images)
+            cut_scene_timer = current_time
+
+        # Draw cut scene
+        screen.blit(cut_scene_images[cut_scene_index], (0, 0))
+
+        # Add text at the bottom of the window with Times New Roman font
+        cut_scene_text_surface = times_new_roman_font.render(cut_scene_text[cut_scene_index], True, WHITE)
+        cut_scene_text_rect = cut_scene_text_surface.get_rect(center=(WIDTH // 2, HEIGHT - 20))
+        screen.blit(cut_scene_text_surface, cut_scene_text_rect)
+
+    # Update display
+    pygame.display.flip()
+
+    # Cap the frame rate
+    clock.tick(FPS)
+
+    # Check for a key press or any other event to proceed to the game
+    keys = pygame.key.get_pressed()
+    if any(keys):
+        cut_scene_running = False
 
 # Stop the introduction music
 pygame.mixer.music.stop()
