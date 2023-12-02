@@ -6,7 +6,7 @@ pygame.init()
 pygame.mixer.init()
 
 # Define constants
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 1100, 800
 FPS = 60
 
 # Set up the game window
@@ -57,7 +57,7 @@ cut_scene_images = [
 ]  # Add your cut scene images to this list
 cut_scene_text = [
     "In the mystical land of Eldoria, a brave adventurer named Seli embarks on a journey.",
-    "Seli discovers an ancient prophecy that foretells of a hidden artifact deep within the Forbidden Forest.",
+    "He discovers an ancient prophecy that foretells of a hidden artifact deep within the Old Forest.",
     "Facing perilous challenges, Seli uncovers the artifact's secrets and gains newfound powers.",
     "As the journey continues, Seli must confront the dark forces threatening Eldoria's balance."
 ]
@@ -73,7 +73,18 @@ while game_running:
         if event.type == pygame.QUIT:
             game_running = False
 
-    # Check if the intro has been running for 5 seconds
+        # Check for mouse clicks
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+
+            # Check if the mouse click is within the New Game buttons
+            for i in range(3):
+                button_rect = pygame.Rect(50, HEIGHT // 2 - 75 + (75 * i), 200, 50)
+                if button_rect.collidepoint(mouse_x, mouse_y):
+                    intro_running = False
+                    menu_running = True
+                    cut_scene_running = True
+
     if intro_running and pygame.time.get_ticks() - intro_start_time >= 5000:
         intro_running = False
         menu_running = True
@@ -87,22 +98,23 @@ while game_running:
         menu_text_rect = menu_text.get_rect(center=(WIDTH // 2, HEIGHT // 4))
         screen.blit(menu_text, menu_text_rect)
 
-        # Add buttons
-        button_height = 50
-        button_spacing = 20
-        button_y = HEIGHT // 2 - (button_height * 3 + button_spacing * 2) // 2
+        if not cut_scene_running:  # Only draw buttons if the cut scene is not running
+            # Add buttons
+            button_height = 50
+            button_spacing = 20
+            button_y = HEIGHT // 2 - (button_height * 3 + button_spacing * 2) // 2
 
-        for i in range(3):
-            button_rect = pygame.Rect(50, button_y + (button_height + button_spacing) * i, 200, button_height)
-            pygame.draw.rect(screen, WHITE, button_rect)
+            for i in range(3):
+                button_rect = pygame.Rect(50, button_y + (button_height + button_spacing) * i, 200, button_height)
+                pygame.draw.rect(screen, WHITE, button_rect)
 
-            button_text = times_new_roman_font.render(f"New Game {i + 1}", True, BLACK)
-            button_text_rect = button_text.get_rect(center=button_rect.center)
-            screen.blit(button_text, button_text_rect)
+                button_text = times_new_roman_font.render(f"New Game {i + 1}", True, BLACK)
+                button_text_rect = button_text.get_rect(center=button_rect.center)
+                screen.blit(button_text, button_text_rect)
 
-            progress_text = times_new_roman_font.render("Progress: 0%", True, WHITE)
-            progress_text_rect = progress_text.get_rect(midleft=(button_rect.right + 10, button_rect.centery))
-            screen.blit(progress_text, progress_text_rect)
+                progress_text = times_new_roman_font.render("Progress: 0%", True, WHITE)
+                progress_text_rect = progress_text.get_rect(midleft=(button_rect.right + 10, button_rect.centery))
+                screen.blit(progress_text, progress_text_rect)
 
     else:
         # Draw introduction screen with the image
@@ -132,19 +144,6 @@ while game_running:
         if text_x >= WIDTH // 2 - game_name_rect.width // 2:
             text_x = WIDTH // 2 - game_name_rect.width // 2
 
-    # Update display
-    pygame.display.flip()
-
-    # Cap the frame rate
-    clock.tick(FPS)
-
-    # Check for a key press or any other event to proceed to the game
-    keys = pygame.key.get_pressed()
-    if any(keys):
-        intro_running = False
-        menu_running = True
-        cut_scene_running = True
-
     # Cut scene logic
     if cut_scene_running:
         current_time = pygame.time.get_ticks()
@@ -152,24 +151,21 @@ while game_running:
             cut_scene_index = (cut_scene_index + 1) % len(cut_scene_images)
             cut_scene_timer = current_time
 
-        # Draw cut scene
-        screen.blit(cut_scene_images[cut_scene_index], (0, 0))
+        # Draw the scene
+        if cut_scene_running:
+            # Draw cut scene
+            screen.blit(cut_scene_images[cut_scene_index], (0, 0))
 
-        # Add text at the bottom of the window with Times New Roman font
-        cut_scene_text_surface = times_new_roman_font.render(cut_scene_text[cut_scene_index], True, WHITE)
-        cut_scene_text_rect = cut_scene_text_surface.get_rect(center=(WIDTH // 2, HEIGHT - 20))
-        screen.blit(cut_scene_text_surface, cut_scene_text_rect)
+            # Add text at the bottom of the window with Times New Roman font
+            cut_scene_text_surface = times_new_roman_font.render(cut_scene_text[cut_scene_index], True, WHITE)
+            cut_scene_text_rect = cut_scene_text_surface.get_rect(center=(WIDTH // 2, HEIGHT - 20))
+            screen.blit(cut_scene_text_surface, cut_scene_text_rect)
 
     # Update display
     pygame.display.flip()
 
     # Cap the frame rate
     clock.tick(FPS)
-
-    # Check for a key press or any other event to proceed to the game
-    keys = pygame.key.get_pressed()
-    if any(keys):
-        cut_scene_running = False
 
 # Stop the introduction music
 pygame.mixer.music.stop()
