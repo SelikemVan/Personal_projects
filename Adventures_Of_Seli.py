@@ -46,7 +46,7 @@ menu_text_color = WHITE
 menu_running = False
 
 # Times New Roman font for the New Game buttons and progress text
-times_new_roman_font = pygame.font.Font("fonts/Typography Times Regular.ttf", 24)
+times_new_roman_font = pygame.font.Font("fonts/Typography Times Regular.ttf", 20)
 
 # Cut scene variables
 cut_scene_images = [
